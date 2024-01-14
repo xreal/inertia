@@ -1,5 +1,7 @@
 import { createServer, IncomingMessage } from 'http'
 import * as process from 'process'
+import { availableParallelism } from 'os';
+import cluster from 'cluster';
 import { InertiaAppResponse, Page } from './types'
 
 type AppCallback = (page: Page) => InertiaAppResponse
@@ -23,18 +25,26 @@ export default (render: AppCallback, port?: number): void => {
     '/404': async () => ({ status: 'NOT_FOUND', timestamp: Date.now() }),
   }
 
-  createServer(async (request, response) => {
-    const dispatchRoute = routes[<string>request.url] || routes['/404']
+  if (cluster.isPrimary) {
+    const numCPUs = availableParallelism();
 
-    try {
-      response.writeHead(200, { 'Content-Type': 'application/json', Server: 'Inertia.js SSR' })
-      response.write(JSON.stringify(await dispatchRoute(request)))
-    } catch (e) {
-      console.error(e)
+    for (let i = 0; i < numCPUs; i++) {
+        cluster.fork();
     }
-
-    response.end()
-  }).listen(_port, () => console.log('Inertia SSR server started.'))
+  } else {
+    createServer(async (request, response) => {
+      const dispatchRoute = routes[<string>request.url] || routes['/404']
+  
+      try {
+        response.writeHead(200, { 'Content-Type': 'application/json', Server: 'Inertia.js SSR' })
+        response.write(JSON.stringify(await dispatchRoute(request)))
+      } catch (e) {
+        console.error(e)
+      }
+  
+      response.end()
+    }).listen(_port, () => console.log('Inertia SSR server started. (processId: ${process.pid})'))
+  }
 
   console.log(`Starting SSR server on port ${_port}...`)
 }
