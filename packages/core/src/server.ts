@@ -1,7 +1,6 @@
 import { createServer, IncomingMessage } from 'http'
 import * as process from 'process'
-import { availableParallelism } from 'os';
-import cluster from 'cluster';
+import cluster from "node:cluster";
 import { InertiaAppResponse, Page } from './types'
 
 type AppCallback = (page: Page) => InertiaAppResponse
@@ -26,13 +25,13 @@ export default (render: AppCallback, port?: number): void => {
   }
 
   if (cluster.isPrimary) {
-    const numCPUs = availableParallelism();
+    const numCPUs = 4;
 
     for (let i = 0; i < numCPUs; i++) {
         cluster.fork();
     }
   } else { 
-    
+
     createServer(async (request, response) => {
       const dispatchRoute = routes[<string>request.url] || routes['/404']
   
