@@ -1,4 +1,4 @@
-import { createHeadManager, Page, PageHandler, router } from '@inertiajs/core'
+import { createHeadManager, Page, PageHandler, router } from '@xreal/inertiacore'
 import { ComponentPublicInstance } from 'vue'
 import useForm from './useForm'
 
@@ -6,7 +6,7 @@ export type VuePageHandlerArgs = Parameters<PageHandler>[0] & {
   component: ComponentPublicInstance | Promise<ComponentPublicInstance>
 }
 
-declare module '@inertiajs/core' {
+declare module '@xreal/inertiacore' {
   export interface Router {
     form: typeof useForm
   }
