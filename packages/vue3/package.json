@@ -7,6 +7,9 @@
     "Jonathan Reinink <jonathan@reinink.ca>"
   ],
   "homepage": "https://inertiajs.com/",
+  "publishConfig": {
+    "@xreal:registry": "https://npm.pkg.github.com"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/xreal/inertia.git",
