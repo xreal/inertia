@@ -31,7 +31,8 @@ export default (render: AppCallback, port?: number): void => {
     for (let i = 0; i < numCPUs; i++) {
         cluster.fork();
     }
-  } else {
+  } else { 
+    
     createServer(async (request, response) => {
       const dispatchRoute = routes[<string>request.url] || routes['/404']
   
